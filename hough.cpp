@@ -52,7 +52,7 @@ int main() {
       input.at<uchar>(j,i) = image->pM[j*image->cols + i];
     }
   }
-  imshow("image", input); waitKey();
+
 	Mat process;
 	Canny(input,process,100,150,3);
 
@@ -67,9 +67,9 @@ int main() {
 	//Transform
 	houghTransform(process.data, width, height);
 
-// 	//Search the accumulator
-// 	getLines(thresh, width, height);
-//
+	//Search the accumulator
+	getLines(thresh, width, height);
+
 // 	//Draw the results
 // 	for(it=0; it<lines_size; it++){
 // 		line(process, Point(lines[it].x1, lines[it].y1), Point(lines[it].x2, lines[it].y2), Scalar::all(128), 2, 8);
@@ -170,8 +170,9 @@ void getLines(int thresh, int width, int height){
 					l.x2 = ((double)(r-(accumulator_height/2)) - ((l.y2 - (height/2) ) * sin(t * M_PI/180))) / cos(t * M_PI/180) + (width / 2);
 				}
 				lines_size++;
-				lines = (Line*)realloc(lines, lines_size);
-				lines[lines_size-1] = l;
+        printf("%d\n",lines_size);
+				//lines = (Line*)realloc(lines, lines_size);
+				//lines[lines_size-1] = l;
 			}
 		}
 	}
