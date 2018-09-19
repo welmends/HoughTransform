@@ -42,34 +42,34 @@ void saveLinesToFile(const char *path);
 
 int main() {
   image=(Matrix*)calloc(1,sizeof(Matrix));
-	readImageHeader("lena.pgm");
-  readImage("lena.pgm");
+	readImageHeader("line.pgm");
+  readImage("line.pgm");
 
   printf("%d, %d\n",image->cols, image->rows);
-  Mat input = Mat::zeros(image->cols, image->rows, CV_8UC1);
-	for(int i=0; i<image->cols; i++){
-    for(int j=0; j<image->rows; j++){
-      input.at<uchar>(j,i) = image->pM[j*image->cols + i];
-    }
-  }
-
-	Mat process;
-	Canny(input,process,100,150,3);
-
-	int it;
-	int width = process.cols;
-	int height = process.rows;
-	int thresh = width>height?width/4:height/4;
-
-  imshow("image", process);
-  waitKey();
-
-	//Transform
-	houghTransform(process.data, width, height);
-
-	//Search the accumulator
-	getLines(thresh, width, height);
-
+  // Mat input = Mat::zeros(image->cols, image->rows, CV_8UC1);
+	// for(int i=0; i<image->cols; i++){
+  //   for(int j=0; j<image->rows; j++){
+  //     input.at<uchar>(j,i) = image->pM[j*image->cols + i];
+  //   }
+  // }
+  //
+	// Mat process;
+	// Canny(input,process,100,150,3);
+  //
+	// int it;
+	// int width = process.cols;
+	// int height = process.rows;
+	// int thresh = width>height?width/4:height/4;
+  //
+  // imshow("image", process);
+  // waitKey();
+  //
+	// //Transform
+	// houghTransform(process.data, width, height);
+  //
+	// //Search the accumulator
+	// getLines(thresh, width, height);
+//
 // 	//Draw the results
 // 	for(it=0; it<lines_size; it++){
 // 		line(process, Point(lines[it].x1, lines[it].y1), Point(lines[it].x2, lines[it].y2), Scalar::all(128), 2, 8);
@@ -186,11 +186,19 @@ void readImageHeader(const char *path){
 
     fp = fopen(path, "r");
     char aux[3];
+    char aux2[1];
     int param1;
     int param2;
     int param3;
 
-    fscanf(fp, "%s %d %d %d",aux,&param1,&param2,&param3);
+    fscanf(fp,"%s",aux);
+    fscanf(fp,"%c",aux2);
+    while(true){
+      fscanf(fp,"%c",aux2);
+      if(*aux2=='\n')
+        break;
+    }
+    fscanf(fp, "%d %d %d",&param1,&param2,&param3);
 
     image->rows=param1;
     image->cols=param2;
