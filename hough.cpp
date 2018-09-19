@@ -42,17 +42,17 @@ void saveLinesToFile(const char *path);
 
 int main() {
   image=(Matrix*)calloc(1,sizeof(Matrix));
-	readImageHeader("line.pgm");
-  readImage("line.pgm");
+	readImageHeader("lena.pgm");
+  readImage("lena.pgm");
 
   printf("%d, %d\n",image->cols, image->rows);
-  // Mat input = Mat::zeros(image->cols, image->rows, CV_8UC1);
-	// for(int i=0; i<image->cols; i++){
-  //   for(int j=0; j<image->rows; j++){
-  //     input.at<uchar>(j,i) = image->pM[j*image->cols + i];
-  //   }
-  // }
-  // imshow("image", input); waitKey();
+  Mat input = Mat::zeros(image->cols, image->rows, CV_8UC1);
+	for(int i=0; i<image->cols; i++){
+    for(int j=0; j<image->rows; j++){
+      input.at<uchar>(j,i) = image->pM[j*image->cols + i];
+    }
+  }
+  imshow("image", input); waitKey();
 // 	Mat process;
 // 	Canny(input,process,100,150,3);
 //
@@ -186,7 +186,7 @@ void readImageHeader(const char *path){
     int param2;
     int param3;
 
-    fscanf(fp, aux, "%d %d %d",&param1,&param2,&param3);
+    fscanf(fp, "%s %d %d %d",aux,&param1,&param2,&param3);
 
     image->rows=param1;
     image->cols=param2;
