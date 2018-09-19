@@ -1,4 +1,4 @@
-//gcc main.cpp -o main.o `pkg-config --cflags --libs opencv` -lstdc++ -lm
+//gcc hough.c -o hough.o `pkg-config --cflags --libs opencv` -lstdc++ -lm
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -11,6 +11,13 @@ using namespace cv;
 using namespace std;
 
 typedef struct{
+    int rows,cols;
+    int gray;
+    unsigned char *pM;
+
+}Matrix;
+
+typedef struct{
 	int x1;
 	int y1;
 	int x2;
@@ -18,6 +25,7 @@ typedef struct{
 }Line;
 
 FILE *file;
+Matrix *image;
 Line* lines;
 int lines_size;
 unsigned int* accumulator;
@@ -27,58 +35,70 @@ int accumulator_height;
 void houghTransform(unsigned char* img_data, int width, int height);
 void getLines(int thresh, int width, int height);
 
-void loadPGMImage(const char *path);
-void saveAccumulatorToFile(char *path);
+void readImageHeader(const char *path);
+void readImage(const char *path);
+void saveAccumulatorToFile(const char *path);
 void saveLinesToFile(const char *path);
 
 int main() {
-	Mat input = cv::imread("line.jpg", 0);
-	Mat process;
-	Canny(input,process,100,150,3);
-	
-	int it;
-	int width = process.cols;
-	int height = process.rows;
-	int thresh = width>height?width/4:height/4;
+  image=(Matrix*)calloc(1,sizeof(Matrix));
+	readImageHeader("line.pgm");
+  readImage("line.pgm");
 
-	//Transform
-	houghTransform(process.data, width, height);
-
-	//Search the accumulator
-	getLines(thresh, width, height);
-
-	//Draw the results
-	for(it=0; it<lines_size; it++){
-		line(process, Point(lines[it].x1, lines[it].y1), Point(lines[it].x2, lines[it].y2), Scalar::all(128), 2, 8);
-	}
-	saveLinesToFile("lines.txt");
-
-	//Visualize all
-	int aw, ah, maxa;
-	aw = ah = maxa = 0;
-	aw = accumulator_width;
-	ah = accumulator_height;
-
-	for(int p=0;p<(ah*aw);p++){
-		if((int)accumulator[p] > maxa)
-			maxa = accumulator[p];
-	}
-	double contrast = 1.0;
-	double coef = 255.0 / (double)maxa * contrast;
-
-	Mat accu(ah, aw, CV_8UC3);
-	for(int p=0;p<(ah*aw);p++){
-		unsigned char c = (double)accumulator[p] * coef < 255.0 ? (double)accumulator[p] * coef : 255.0;
-		accu.data[(p*3)+0] = 255;
-		accu.data[(p*3)+1] = 255-c;
-		accu.data[(p*3)+2] = 255-c;
-	}
-
-	cv::imshow("CW_IMG_ORIGINAL", process);
-	cv::imshow("CW_ACCUMULATOR", accu);
-	cv::waitKey();
-
-	return 0;
+  printf("%d, %d\n",image->cols, image->rows);
+  // Mat input = Mat::zeros(image->cols, image->rows, CV_8UC1);
+	// for(int i=0; i<image->cols; i++){
+  //   for(int j=0; j<image->rows; j++){
+  //     input.at<uchar>(j,i) = image->pM[j*image->cols + i];
+  //   }
+  // }
+  // imshow("image", input); waitKey();
+// 	Mat process;
+// 	Canny(input,process,100,150,3);
+//
+// 	int it;
+// 	int width = process.cols;
+// 	int height = process.rows;
+// 	int thresh = width>height?width/4:height/4;
+//
+// 	//Transform
+// 	houghTransform(process.data, width, height);
+//
+// 	//Search the accumulator
+// 	getLines(thresh, width, height);
+//
+// 	//Draw the results
+// 	for(it=0; it<lines_size; it++){
+// 		line(process, Point(lines[it].x1, lines[it].y1), Point(lines[it].x2, lines[it].y2), Scalar::all(128), 2, 8);
+// 	}
+// 	saveLinesToFile("lines.txt");
+//
+// 	//Visualize all
+// 	int aw, ah, maxa;
+// 	aw = ah = maxa = 0;
+// 	aw = accumulator_width;
+// 	ah = accumulator_height;
+//
+// 	for(int p=0;p<(ah*aw);p++){
+// 		if((int)accumulator[p] > maxa)
+// 			maxa = accumulator[p];
+// 	}
+// 	double contrast = 1.0;
+// 	double coef = 255.0 / (double)maxa * contrast;
+//
+// 	Mat accu(ah, aw, CV_8UC3);
+// 	for(int p=0;p<(ah*aw);p++){
+// 		unsigned char c = (double)accumulator[p] * coef < 255.0 ? (double)accumulator[p] * coef : 255.0;
+// 		accu.data[(p*3)+0] = 255;
+// 		accu.data[(p*3)+1] = 255-c;
+// 		accu.data[(p*3)+2] = 255-c;
+// 	}
+//
+// 	cv::imshow("CW_IMG_ORIGINAL", process);
+// 	cv::imshow("CW_ACCUMULATOR", accu);
+// 	cv::waitKey();
+//
+ 	return 0;
 }
 
 void houghTransform(unsigned char* img_data, int width, int height){
@@ -156,7 +176,42 @@ void getLines(int thresh, int width, int height){
 	printf("lines: %d | thresh: %d\n", (int)lines_size, thresh);
 }
 
-void saveAccumulatorToFile(char *path){
+void readImageHeader(const char *path){
+    /* Ler o cabeçalho da imagem */
+    FILE *fp;
+
+    fp = fopen(path, "r");
+    char aux[3];
+    int param1;
+    int param2;
+    int param3;
+
+    fscanf(fp, aux, "%d %d %d",&param1,&param2,&param3);
+
+    image->rows=param1;
+    image->cols=param2;
+    image->gray=param3;
+
+    fclose(fp);
+}
+
+void readImage(const char *path){
+    /* Ler a imagem */
+
+    FILE *fp;
+
+    fp = fopen(path, "rb");
+
+    fseek(fp, 15, SEEK_SET);//Reposicionando o local de leitura do arquivo
+
+    image->pM=(unsigned char*)malloc(sizeof(unsigned char)*image->rows*image->cols);
+
+    fread(image->pM, sizeof(unsigned char), image->rows*image->cols, fp);
+
+    fclose(fp);
+}
+
+void saveAccumulatorToFile(const char *path){
 	return;
 }
 
