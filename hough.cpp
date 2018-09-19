@@ -53,17 +53,20 @@ int main() {
     }
   }
   imshow("image", input); waitKey();
-// 	Mat process;
-// 	Canny(input,process,100,150,3);
-//
-// 	int it;
-// 	int width = process.cols;
-// 	int height = process.rows;
-// 	int thresh = width>height?width/4:height/4;
-//
-// 	//Transform
-// 	houghTransform(process.data, width, height);
-//
+	Mat process;
+	Canny(input,process,100,150,3);
+
+	int it;
+	int width = process.cols;
+	int height = process.rows;
+	int thresh = width>height?width/4:height/4;
+
+  imshow("image", process);
+  waitKey();
+
+	//Transform
+	houghTransform(process.data, width, height);
+
 // 	//Search the accumulator
 // 	getLines(thresh, width, height);
 //
