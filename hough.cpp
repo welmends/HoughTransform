@@ -45,30 +45,31 @@ int main() {
 	readImageHeader("line.pgm");
   readImage("line.pgm");
 
-  printf("%d, %d\n",image->cols, image->rows);
-  // Mat input = Mat::zeros(image->cols, image->rows, CV_8UC1);
-	// for(int i=0; i<image->cols; i++){
-  //   for(int j=0; j<image->rows; j++){
-  //     input.at<uchar>(j,i) = image->pM[j*image->cols + i];
-  //   }
-  // }
-  //
-	// Mat process;
-	// Canny(input,process,100,150,3);
-  //
-	// int it;
-	// int width = process.cols;
-	// int height = process.rows;
-	// int thresh = width>height?width/4:height/4;
-  //
-  // imshow("image", process);
-  // waitKey();
-  //
-	// //Transform
-	// houghTransform(process.data, width, height);
-  //
-	// //Search the accumulator
-	// getLines(thresh, width, height);
+  Mat input = Mat::zeros(image->cols, image->rows, CV_8UC1);
+	for(int i=0; i<image->cols; i++){
+    for(int j=0; j<image->rows; j++){
+      input.at<uchar>(i,j) = image->pM[j*image->cols + i];
+    }
+  }
+
+  imshow("image", input);
+  waitKey();
+
+	Mat process;
+	Canny(input,process,100,150,3);
+
+	int it;
+	int width = process.cols;
+	int height = process.rows;
+	int thresh = width>height?width/4:height/4;
+
+
+
+	//Transform
+  houghTransform(process.data, width, height);
+
+	//Search the accumulator
+	getLines(thresh, width, height);
 //
 // 	//Draw the results
 // 	for(it=0; it<lines_size; it++){
@@ -212,7 +213,7 @@ void readImage(const char *path){
 
     FILE *fp;
 
-    fp = fopen(path, "rb");
+    fp = fopen(path, "r");
 
     fseek(fp, 15, SEEK_SET);//Reposicionando o local de leitura do arquivo
 
