@@ -1,23 +1,13 @@
-#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/core/core.hpp"
-
-using namespace cv;
-using namespace std;
-
 typedef struct{
-    int rows,cols;
-    int gray;
+    int rows,cols,gray;
     unsigned char *pM;
-
 }Matrix;
-Matrix *image;
 
+Matrix *image;
 unsigned int* accumulator;
 int accumulator_width;
 int accumulator_height;
@@ -28,50 +18,10 @@ void writeImage(const char *path);
 
 int main() {
   image=(Matrix*)calloc(1,sizeof(Matrix));
-  readImage("images/bug.PGM");
+  readImage("images/line.pgm");
 
-  cout<<image->rows<<endl;
-  cout<<image->cols<<endl;
-  Mat input = Mat::zeros(image->cols, image->rows, CV_8UC1);
-  for(int i=0; i<image->cols; i++){
-    for(int j=0; j<image->rows; j++){
-      input.at<uchar>(i,j) = image->pM[i*image->rows + j];
-    }
-  }
+  houghTransform(image->pM, image->cols, image->rows);
 
-  imshow("image", input);
-  waitKey();
-  writeImage("/home/well/Desktop/cu.PGM");
-  /*
-  Mat input;
-  Mat process;
-  input = imread("images/lines.png", 0);
-	Canny(input,process,100,150,3);
-
-	int width = process.cols;
-	int height = process.rows;
-
-	//Transform
-  houghTransform(process.data, width, height);
-
-  cout<<accumulator_width<<endl;
-  cout<<accumulator_height<<endl;
-
-  Mat H = Mat::zeros(accumulator_height, accumulator_width, CV_8UC1);
-  for(int i=0; i<H.rows; i++){
-    for(int j=0; j<H.cols; j++){
-      if(accumulator[i*H.cols + j]<1){
-          H.at<uchar>(i,j) = 0;
-      }else{
-        H.at<uchar>(i,j) = 255;
-      }
-      H.at<uchar>(i,j) = 50+accumulator[i*H.cols + j];
-    }
-  }
-  resize(H,H,Size(550,390));
-  imshow("H", H);
-  waitKey();
-  */
  	return 0;
 }
 
