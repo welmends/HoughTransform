@@ -15,11 +15,11 @@ int main() {
   Matrix *image=(Matrix*)calloc(1,sizeof(Matrix));
   Matrix *accumulator = (Matrix*)calloc(1,sizeof(Matrix));
 
-  readImage(image, "images/line.pgm");
+  readImage(image, "images/canny/line.pgm");
 
   houghTransform(image, accumulator);
 
-  writeImage(image, "accu.pgm");
+  writeImage(accumulator, "/home/well/Desktop/accu.pgm");
 
  	return 0;
 }
