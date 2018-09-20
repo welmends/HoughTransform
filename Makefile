@@ -1,10 +1,13 @@
 CCC = gcc
 CXX = gcc
 
-houghTransform: clean hough run
+houghTransform: clean callShell hough run
+
+callShell:
+	$(shell mkdir -p objs)
 
 hough: src/hough.c
-	gcc src/hough.c -o objs/hough.o `pkg-config --cflags --libs opencv` -lstdc++ -lm
+	gcc src/hough.c -o objs/hough.o -lstdc++ -lm
 
 run:
 	./objs/hough.o
