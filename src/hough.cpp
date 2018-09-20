@@ -23,21 +23,36 @@ int accumulator_width;
 int accumulator_height;
 
 void houghTransform(unsigned char* img_data, int width, int height);
-void getLines(int thresh, int width, int height);
 
 int main() {
   Mat input;
   Mat process;
-  input = imread("lines.png", 0);
+  input = imread("images/lines.png", 0);
 	Canny(input,process,100,150,3);
-
-	int it;
+  
 	int width = process.cols;
 	int height = process.rows;
-	int thresh = width>height?width/4:height/4;
 
 	//Transform
   houghTransform(process.data, width, height);
+
+  cout<<accumulator_width<<endl;
+  cout<<accumulator_height<<endl;
+
+  Mat H = Mat::zeros(accumulator_height, accumulator_width, CV_8UC1);
+  for(int i=0; i<H.rows; i++){
+    for(int j=0; j<H.cols; j++){
+      if(accumulator[i*H.cols + j]<1){
+          H.at<uchar>(i,j) = 0;
+      }else{
+        H.at<uchar>(i,j) = 255;
+      }
+      H.at<uchar>(i,j) = 50+accumulator[i*H.cols + j];
+    }
+  }
+  resize(H,H,Size(550,390));
+  imshow("H", H);
+  waitKey();
 
  	return 0;
 }
