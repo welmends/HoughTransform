@@ -19,7 +19,7 @@ int main() {
 
   houghTransform(image, accumulator);
 
-  writeImage(accumulator, "/home/well/Desktop/accu.pgm");
+  writeImage(accumulator, "results/accu.pgm");
 
  	return 0;
 }
