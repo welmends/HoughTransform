@@ -10,4 +10,4 @@ run:
 	./objs/hough.o
 
 clean:
-	rm -rf *.o
+	rm -rf objs/*.o
