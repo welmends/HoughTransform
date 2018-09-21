@@ -1,7 +1,8 @@
 /**
  * @file hough.c
  * @brief Hough Transform Implemantation - ARM(Raspberry)
-          Input : Path to an image, Type of the image (Canny or Original) and Output type (Binary or 8 Bits)
+          Input : Path to an image, Type of the image (Canny or Original) and
+                  Output type (Binary or 8 Bits)
           Output: Hough Transform Matrix (Accumulator image [PGM])
  * @author $Author:$ de Souza, Joao Wellington Mendes; Brito, Messyo Sousa
  * @version $Revision:$
@@ -38,7 +39,7 @@ typedef struct{
 //                                 Prototypes                                 //
 ////////////////////////////////////////////////////////////////////////////////
 void instructions(void);
-char* getImagePath(char *out_type);
+char* getImagePath(char **argv, char *out_type);
 void readImage(Matrix *image, const char *path);
 void writeImage(Matrix *image, const char *path);
 void houghTransform(Matrix *image, Matrix *accumulator, char out_type);
@@ -53,19 +54,24 @@ void houghTransform(Matrix *image, Matrix *accumulator, char out_type);
  * @brief: The main method will call all other methods aiming to perform all
  *         operations prescribed. Also, the main method receives as input the
  *         arguments.
- * @param: void
+ * @param: int argc, char **argv
  * @return: int
  */
-int main(void) {
-  Matrix image[1];
-  Matrix accumulator[1];
-  char out_type[1];
+int main(int argc, char **argv) {
+  if(argc!=4){
+    instructions();
+    return 1;
+  }
+  else{
+    Matrix image[1];
+    Matrix accumulator[1];
+    char out_type[1];
 
-  //readImage(image, getImagePath(argv, out_type));
-  houghTransform(image, accumulator, *out_type);
-  writeImage(accumulator, "results/houghAccu.pgm");
-
-  return 0;
+    readImage(image, getImagePath(argv,out_type));
+    houghTransform(image, accumulator, *out_type);
+    writeImage(accumulator, "houghAccu.pgm");
+    return 0;
+  }
 }
 
 /**
@@ -76,18 +82,18 @@ int main(void) {
  */
 void instructions(void){
   printf("\n");
-  printf(" **************************************************** \n");
-  printf("|                   [Instructions]                   |\n");
-  //printf("|                 [Running the code]                 |\n");
-  printf("| Command: ./hough.o <type> <out_type> <image_name>  |\n");
-  printf("| Warning: The PGM image must be in 'images' folder  |\n");
-  printf("| Example: ./hough.o canny binary lines              |\n");
-  printf("| Example: ./hough.o original 8bits lines            |\n");
-  printf("|                                                    |\n");
-  printf("| <type>       : canny or original                   |\n");
-  printf("| <out_type>   : binary or 8bits                     |\n");
-  printf("| <image_name> : Any PGM image                       |\n");
-  printf(" **************************************************** \n");
+  printf(" **************************************************************************** \n");
+  printf("|                               [Instructions]                               |\n");
+  printf("| Compile: arm-unknown-linux-gnueabi-gcc src/hough_ARM.c -o objs/hough_ARM.o |\n");
+  printf("| Command: ./objs/hough_ARM.o <type> <out_type> <image_name>                 |\n");
+  printf("| Warning: The PGM image must be in 'images' folder                          |\n");
+  printf("| Example: ./objs/hough_ARM.o canny binary lines                             |\n");
+  printf("| Example: ./objs/hough_ARM.o original 8bits lines                           |\n");
+  printf("|                                                                            |\n");
+  printf("| <type>       : canny or original                                           |\n");
+  printf("| <out_type>   : binary or 8bits                                             |\n");
+  printf("| <image_name> : Any PGM image                                               |\n");
+  printf(" **************************************************************************** \n");
   printf("\n");
 }
 
@@ -98,32 +104,32 @@ void instructions(void){
  * @param: char **argv, char *out_type
  * @return: char*
  */
-char* getImagePath(char *out_type){
-  // // Verifies if the <type> and <out_type> params are valid
-  // if(strcmp(argv[1],"canny")!=0 && strcmp(argv[1],"original")!=0){
-  //   printf("Error: <type> must be canny or original\n");
-  //   exit(-1);
-  // }
-  // if(strcmp(argv[2],"binary")==0){
-  //   *out_type='b';
-  // }
-  // else if(strcmp(argv[2],"8bits")==0){
-  //   *out_type='8';
-  // }
-  // else{
-  //   printf("Error: <out_type> must be binary or 8bits\n");
-  //   exit(-1);
-  // }
-  //
-  // // Concatenate a path to the required image
-  // char *imagePath = (char*)calloc(IMAGE_PATH_SIZE, sizeof(char));
-  // strcpy(imagePath, "images/");
-  // strcat(imagePath, argv[1]);
-  // strcat(imagePath, "/");
-  // strcat(imagePath, argv[3]);
-  // strcat(imagePath, ".pgm");
-  //
-  // return imagePath;
+char* getImagePath(char **argv, char *out_type){
+  // Verifies if the <type> and <out_type> params are valid
+  if(strcmp(argv[1],"canny")!=0 && strcmp(argv[1],"original")!=0){
+    printf("Error: <type> must be canny or original\n");
+    exit(-1);
+  }
+  if(strcmp(argv[2],"binary")==0){
+    *out_type='b';
+  }
+  else if(strcmp(argv[2],"8bits")==0){
+    *out_type='8';
+  }
+  else{
+    printf("Error: <out_type> must be binary or 8bits\n");
+    exit(-1);
+  }
+
+  // Concatenate a path to the required image
+  char *imagePath = (char*)calloc(IMAGE_PATH_SIZE, sizeof(char));
+  strcpy(imagePath, "images/");
+  strcat(imagePath, argv[1]);
+  strcat(imagePath, "/");
+  strcat(imagePath, argv[3]);
+  strcat(imagePath, ".pgm");
+
+  return imagePath;
 }
 
 /**

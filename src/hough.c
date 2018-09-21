@@ -1,7 +1,8 @@
 /**
  * @file hough.c
  * @brief Hough Transform Implemantation
-          Input : Path to an image, Type of the image (Canny or Original) and Output type (Binary or 8 Bits)
+          Input : Path to an image, Type of the image (Canny or Original) and
+                  Output type (Binary or 8 Bits)
           Output: Hough Transform Matrix (Accumulator image [PGM])
  * @author $Author:$ de Souza, Joao Wellington Mendes; Brito, Messyo Sousa
  * @version $Revision:$
@@ -83,17 +84,17 @@ int main(int argc, char **argv) {
  */
 void instructions(void){
   printf("\n");
-  printf(" **************************************************** \n");
-  printf("|                   [Instructions]                   |\n");
-  //printf("|                 [Running the code]                 |\n");
-  printf("| Command: ./hough.o <type> <out_type> <image_name>  |\n");
-  printf("| Warning: The PGM image must be in 'images' folder  |\n");
-  printf("| Example: ./hough.o canny binary lines              |\n");
-  printf("| Example: ./hough.o original 8bits lines            |\n");
-  printf("|                                                    |\n");
-  printf("| <type>       : canny or original                   |\n");
-  printf("| <out_type>   : binary or 8bits                     |\n");
-  printf("| <image_name> : Any PGM image                       |\n");
+  printf(" ********************************************************* \n");
+  printf("|                      [Instructions]                     |\n");
+  printf("| Compile: gcc src/hough.c -o objs/hough.o -lm            |\n");
+  printf("| Command: ./objs/hough.o <type> <out_type> <image_name>  |\n");
+  printf("| Warning: The PGM image must be in 'images' folder       |\n");
+  printf("| Example: ./objs/hough.o canny binary lines              |\n");
+  printf("| Example: ./objs/hough.o original 8bits lines            |\n");
+  printf("|                                                         |\n");
+  printf("| <type>       : canny or original                        |\n");
+  printf("| <out_type>   : binary or 8bits                          |\n");
+  printf("| <image_name> : Any PGM image                            |\n");
   printf(" **************************************************** \n");
   printf("\n");
 }
