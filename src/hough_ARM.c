@@ -39,7 +39,7 @@ typedef struct{
 //                                 Prototypes                                 //
 ////////////////////////////////////////////////////////////////////////////////
 void instructions(void);
-char* getImagePath(char **argv, char *out_type);
+void getImagePath(char **argv, char *imagePath, char *out_type);
 void readImage(Matrix *image, const char *path);
 void writeImage(Matrix *image, const char *path);
 void houghTransform(Matrix *image, Matrix *accumulator, char out_type);
@@ -65,11 +65,13 @@ int main(int argc, char **argv) {
   else{
     Matrix image[1];
     Matrix accumulator[1];
+    char imagePath[IMAGE_PATH_SIZE];
     char out_type[1];
 
-    readImage(image, getImagePath(argv,out_type));
+    getImagePath(argv,imagePath,out_type);
+    readImage(image, imagePath);
     houghTransform(image, accumulator, *out_type);
-    writeImage(accumulator, "houghAccu.pgm");
+    writeImage(accumulator, "results/houghAccu.pgm");
     return 0;
   }
 }
@@ -99,12 +101,12 @@ void instructions(void){
 
 /**
  * @author: Joao Wellington and Messyo Sousa
- * @brief: Verifies the type arguments and returns a path to read a specifc
- *         image.
- * @param: char **argv, char *out_type
- * @return: char*
+ * @brief: Verifies the type arguments, modifies a variable by adding the path to
+ *         read a specific image and also modifies a variable of the output type.
+ * @param: char **argv, char *imagePath, char *out_type
+ * @return: void
  */
-char* getImagePath(char **argv, char *out_type){
+void getImagePath(char **argv, char *imagePath, char *out_type){
   // Verifies if the <type> and <out_type> params are valid
   if(strcmp(argv[1],"canny")!=0 && strcmp(argv[1],"original")!=0){
     printf("Error: <type> must be canny or original\n");
@@ -122,14 +124,11 @@ char* getImagePath(char **argv, char *out_type){
   }
 
   // Concatenate a path to the required image
-  char *imagePath = (char*)calloc(IMAGE_PATH_SIZE, sizeof(char));
   strcpy(imagePath, "images/");
   strcat(imagePath, argv[1]);
   strcat(imagePath, "/");
   strcat(imagePath, argv[3]);
   strcat(imagePath, ".pgm");
-
-  return imagePath;
 }
 
 /**
