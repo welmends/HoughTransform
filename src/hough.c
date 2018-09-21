@@ -220,19 +220,16 @@ void houghTransform(Matrix *image, Matrix *accumulator, char out_type){
 		for(i=0; i<image->rows; i++){
 			if(image->pM[ (j*image->rows) + i] > THRESH_VALUE){
 				for(theta=0; theta<180; theta++){
-					// rho = xcos(theta) + ysin(theta)
+					// rho = xcos(theta) + ysin(theta) [theta is in radians]
 					rho = ( (j)*cos(theta*M_PI/180)  ) + ( (i)*sin(theta*M_PI/180) );
 
-          // Verifies if the thetha and rho+D is in the accumulator range
-          if((int)((ceil(rho + accumulator->cols/2) * 180.0)) + theta>0 && (int)((ceil(rho + accumulator->cols/2) * 180.0)) + theta<accumulator->rows*accumulator->cols){
-           if(out_type=='b'){
-             // accumulator(theta,rho+D) = High Level
-             accumulator->pM[ (int)((ceil(rho + accumulator->cols/2) * 180.0)) + 180-theta-1] = accumulator->grayscale;
-           }
-           else{
-             // accumulator(theta,rho+D)++
-             accumulator->pM[ (int)((ceil(rho + accumulator->cols/2) * 180.0)) + 180-theta-1]++;
-           }
+          if(out_type=='b'){
+           // accumulator(theta,rho+D) = High Level
+           accumulator->pM[ (int)((ceil(rho + accumulator->cols/2) * 180.0)) + 180-theta-1] = accumulator->grayscale;
+          }
+          else{
+           // accumulator(theta,rho+D)++
+           accumulator->pM[ (int)((ceil(rho + accumulator->cols/2) * 180.0)) + 180-theta-1]++;
           }
 				}
 			}
