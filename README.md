@@ -18,7 +18,8 @@ make
 - or enter the gcc command yourself at terminal:
 
 ```shell
-gcc hough.c -o hough.o -lm
+mkdir -p objs
+gcc src/hough.c -o objs/hough.o -lm
 ```
 
 ### Executing
@@ -26,7 +27,7 @@ gcc hough.c -o hough.o -lm
 - Command:
 
 ```shell
-./hough.o <type> <out_type> <image_name>
+./objs/hough.o <type> <out_type> <image_name>
 ```
 
 - Warning: The PGM image must be in 'images' folder
