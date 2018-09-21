@@ -8,32 +8,49 @@
  * @date $Date:$ 21/09/2018
  */
 
+ ////////////////////////////////////////////////////////////////////////////////
+ //                                 Libraries                                  //
+ ////////////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
 
+////////////////////////////////////////////////////////////////////////////////
+//                                   Macros                                   //
+////////////////////////////////////////////////////////////////////////////////
 #define IMAGE_PATH_SIZE (100)
 #define THRESH_VALUE    (200)
 
+////////////////////////////////////////////////////////////////////////////////
+//                                  Structs                                   //
+////////////////////////////////////////////////////////////////////////////////
 typedef struct{
-    int rows,cols,gray;
+    int rows,cols,grayscale;
     unsigned char *pM;
 }Matrix;
 
+////////////////////////////////////////////////////////////////////////////////
+//                                 Prototypes                                 //
+////////////////////////////////////////////////////////////////////////////////
 void instructions(void);
 char* getImagePath(char **argv, char *out_type);
 void readImage(Matrix *image, const char *path);
 void writeImage(Matrix *image, const char *path);
 void houghTransform(Matrix *image, Matrix *accumulator, char out_type);
 
+
+////////////////////////////////////////////////////////////////////////////////
+//                                Source Code                                 //
+////////////////////////////////////////////////////////////////////////////////
+
 /**
- *  Function: main
- *  Input: int argc, char **argv
- *  Output: int
- *  Purpose: The main method will call all other methods
- *  aiming to perform all operations prescribed. Also,
- *  the main method receives as input the arguments.
+ * @author: Joao Wellington and Messyo Sousa
+ * @brief: The main method will call all other methods aiming to perform all
+ *         operations prescribed. Also, the main method receives as input the
+ *         arguments.
+ * @param: int argc, char **argv
+ * @return: int
  */
 int main(int argc, char **argv) {
   if(argc!=4){
@@ -53,11 +70,10 @@ int main(int argc, char **argv) {
 }
 
 /**
- *  Function: instructions
- *  Input: ---
- *  Output: void
- *  Purpose: Print on screen the instructions to use this
- *  program.
+ * @author: Joao Wellington and Messyo Sousa
+ * @brief: Print on screen the instructions to use this program.
+ * @param: void
+ * @return: void
  */
 void instructions(void){
   printf("\n");
@@ -77,13 +93,14 @@ void instructions(void){
 }
 
 /**
- *  Function: getImagePath
- *  Input: char **argv, char *out_type
- *  Output: char*
- *  Purpose: Verifies the type arguments and returns a path to
- *  read a specifc image.
+ * @author: Joao Wellington and Messyo Sousa
+ * @brief: Verifies the type arguments and returns a path to read a specifc
+ *         image.
+ * @param: char **argv, char *out_type
+ * @return: char*
  */
 char* getImagePath(char **argv, char *out_type){
+  // Verifies if the <type> and <out_type> params are valid
   if(strcmp(argv[1],"canny")!=0 && strcmp(argv[1],"original")!=0){
     printf("Error: <type> must be canny or original\n");
     exit(-1);
@@ -99,6 +116,7 @@ char* getImagePath(char **argv, char *out_type){
     exit(-1);
   }
 
+  // Concatenate a path to the required image
   char *imagePath = (char*)calloc(IMAGE_PATH_SIZE, sizeof(char));
   strcpy(imagePath, "images/");
   strcat(imagePath, argv[1]);
@@ -109,75 +127,93 @@ char* getImagePath(char **argv, char *out_type){
 }
 
 /**
- *  Function: readImage
- *  Input: Matrix *image, const char *path
- *  Output: void
- *  Purpose: Since the path to a specific image was passed to
- *  this method, this function reads the header and the PGM
- *  image and stores this at the Matrix Structure passed as
- *  input to this method.
+ * @author: Joao Wellington and Messyo Sousa
+ * @brief: Since the path to a specific image was passed to this method, this
+ *         function reads the header and the PGM image and stores this at the
+ *         Matrix Structure passed as input to this method.
+ * @param: Matrix *image, const char *path
+ * @return: void
  */
 void readImage(Matrix *image, const char *path){
-    FILE *fp;
-    fp = fopen(path, "r");
-    char aux[3];
-    int param1,param2,param3;
+  int param1,param2,param3;
+  char aux[3];
+  FILE *fp;
 
-    fscanf(fp,"%s",aux);
-    while(getc((fp)) == '#'){
-      while(getc((fp)) != '\n');
-    }
-    fscanf(fp, "%d %d %d",&param1,&param2,&param3);
+  // Open file in the provided path
+  fp = fopen(path, "r");
+  if(!fp){
+    printf("Error: The image does not exist in the provided path\n");
+    exit(-1);
+  }
 
-    image->rows=param1;
-    image->cols=param2;
-    image->gray=param3;
-    image->pM=(unsigned char*)malloc(sizeof(unsigned char)*image->rows*image->cols);
-    fread(image->pM, sizeof(unsigned char), image->rows*image->cols, fp);
+  // Read the magic number from the header
+  fscanf(fp,"%s",aux);
 
-    fclose(fp);
+  // Discard comments
+  while(getc((fp)) == '#'){
+    while(getc((fp)) != '\n');
+  }
+
+  // Read the height, width and grayscale from the header
+  fscanf(fp, "%d %d %d",&image->rows,&image->cols,&image->grayscale);
+
+  // Read the image from the opened file
+  image->pM=(unsigned char*)malloc(sizeof(unsigned char)*image->rows*image->cols);
+  fread(image->pM, sizeof(unsigned char), image->rows*image->cols, fp);
+
+  // Close file
+  fclose(fp);
 }
 
 /**
- *  Function: writeImage
- *  Input: Matrix *image, const char *path
- *  Output: void
- *  Purpose: Writes the Matrix Structure passed as input to
- *  this method in a specific path that was also passed as
- *  input to this method.
+ * @author: Joao Wellington and Messyo Sousa
+ * @brief: Writes the Matrix Structure passed as input to this method in a
+ *         specific path that was also passed as input to this method.
+ * @param: Matrix *image, const char *path
+ * @return: void
  */
 void writeImage(Matrix *image, const char *path){
     FILE *fp;
-    fp = fopen(path, "w");
 
+    // Open file in the provided path
+    fp = fopen(path, "w");
+    if(!fp){
+      printf("Error: Could not open the file\n");
+      exit(-1);
+    }
+
+    // Write the image in PGM format on the provided path
     fprintf(fp, "P5\n");
-    fprintf(fp, "# PGM file\n");
+    fprintf(fp, "# PGM file generate by hough application\n");
     fprintf(fp, "%d %d\n",image->rows, image->cols);
-    fprintf(fp, "%d\n",image->gray);
+    fprintf(fp, "%d\n",image->grayscale);
     fwrite(image->pM, sizeof(unsigned char), image->rows*image->cols, fp);
 
+    // Close file
     fclose(fp);
 }
 
 /**
- *  Function: houghTransform
- *  Input: Matrix *image, Matrix *accumulator, char out_type
- *  Output: void
- *  Purpose: This function performs all the calculus related
- *  to the Hough Transform. This occurs from the image scanning
- *  and calculation of the rho = xcos (theta) + ysin (theta)
- *  [0 < theta < 180] for pixels that display the high level.
- *  It is worth mentioning that if the image passed as an
- *  input is not binarized, a threshold will be applied to
- *  it with a default threshold value set in THRESH_VALUE.
+ * @author: Joao Wellington and Messyo Sousa
+ * @brief: This method performs all the calculus related to the Hough Transform.
+ *         This occurs from the image scanning and calculation of the
+ *         rho = xcos (theta) + ysin (theta) [0 < theta < 180] for pixels that
+ *         display the high level (>THRESH_VALUE). It is worth mentioning that
+ *         if the image passed as an input is not binarized, a threshold will
+ *         be applied to it with a default threshold value set in THRESH_VALUE.
+ * @param: Matrix *image, Matrix *accumulator, char out_type
+ * @return: void
  */
 void houghTransform(Matrix *image, Matrix *accumulator, char out_type){
-	//accu_height = 2*D and D = sqrt(height^2 + width^2)
-	accumulator->cols  = ceil(2*(sqrt(image->rows*image->rows + image->cols*image->cols))) - 1;
-	accumulator->rows  = 180;
-  accumulator->gray  = 255;
-	accumulator->pM    = (unsigned char*)calloc(accumulator->rows*accumulator->cols, sizeof(unsigned char));
+  // Calculate the height and width of the Hough accumulator
+  // accu_width  = 0 to 180 degrees
+	// accu_height = 2*D - 1 and D = sqrt(height^2 + width^2)
+	accumulator->rows       = 180;
+  accumulator->cols       = ceil(2*(sqrt(image->rows*image->rows + image->cols*image->cols))) - 1;
+  accumulator->grayscale  = image->grayscale;
+	accumulator->pM         = (unsigned char*)calloc(accumulator->rows*accumulator->cols, sizeof(unsigned char));
 
+  // Go to each pixel with hight level (>THRESH_VALUE) and calculate Rho to each Theta
 	double rho;
 	int theta,i,j;
 	for(j=0; j<image->cols; j++){
@@ -186,12 +222,15 @@ void houghTransform(Matrix *image, Matrix *accumulator, char out_type){
 				for(theta=0; theta<180; theta++){
 					// rho = xcos(theta) + ysin(theta)
 					rho = ( (j)*cos(theta*M_PI/180)  ) + ( (i)*sin(theta*M_PI/180) );
-					// accumulator(theta,rho+D)++
+
+          // Verifies if the thetha and rho+D is in the accumulator range
           if((int)((ceil(rho + accumulator->cols/2) * 180.0)) + theta>0 && (int)((ceil(rho + accumulator->cols/2) * 180.0)) + theta<accumulator->rows*accumulator->cols){
            if(out_type=='b'){
-             accumulator->pM[ (int)((ceil(rho + accumulator->cols/2) * 180.0)) + 180-theta-1]=255;
+             // accumulator(theta,rho+D) = High Level
+             accumulator->pM[ (int)((ceil(rho + accumulator->cols/2) * 180.0)) + 180-theta-1] = accumulator->grayscale;
            }
            else{
+             // accumulator(theta,rho+D)++
              accumulator->pM[ (int)((ceil(rho + accumulator->cols/2) * 180.0)) + 180-theta-1]++;
            }
           }
