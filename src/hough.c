@@ -15,10 +15,8 @@ int main() {
   Matrix *image=(Matrix*)calloc(1,sizeof(Matrix));
   Matrix *accumulator = (Matrix*)calloc(1,sizeof(Matrix));
 
-  readImage(image, "images/canny/lines.pgm");
-
+  readImage(image, "images/canny/building.pgm");
   houghTransform(image, accumulator);
-
   writeImage(accumulator, "results/accu.pgm");
 
  	return 0;
@@ -26,7 +24,7 @@ int main() {
 
 void houghTransform(Matrix *image, Matrix *accumulator){
 	//accu_height = 2*D and D = sqrt(height^2 + width^2)
-	accumulator->cols  = ceil(2*(sqrt(image->rows*image->rows + image->cols*image->cols)));
+	accumulator->cols  = ceil(2*(sqrt(image->rows*image->rows + image->cols*image->cols))) - 1;
 	accumulator->rows  = 180;
   accumulator->gray  = 255;
 	accumulator->pM    = (unsigned char*)calloc(accumulator->rows*accumulator->cols, sizeof(unsigned char));
@@ -38,11 +36,11 @@ void houghTransform(Matrix *image, Matrix *accumulator){
 			if(image->pM[ (j*image->rows) + i] == 255){
 				for(theta=0; theta<180; theta++){
 					// rho = xcos(theta) + ysin(theta)
-					rho = ( (i)*cos(theta*M_PI/180)  ) + ( (j)*sin(theta*M_PI/180) );
+					rho = ( (j)*cos(theta*M_PI/180)  ) + ( (i)*sin(theta*M_PI/180) );
 					// accumulator(theta,rho+D)++
           if((int)((ceil(rho + accumulator->cols/2) * 180.0)) + theta>0 &&
              (int)((ceil(rho + accumulator->cols/2) * 180.0)) + theta<accumulator->rows*accumulator->cols){
-               	accumulator->pM[ (int)((ceil(rho + accumulator->cols/2) * 180.0)) + theta]++;
+               	accumulator->pM[ (int)((ceil(rho + accumulator->cols/2) * 180.0)) + 180-theta-1]++;
           }
 				}
 			}
