@@ -21,7 +21,7 @@ typedef struct{
     unsigned char *pM;
 }Matrix;
 
-void instructions();
+void instructions(void);
 char* getImagePath(char **argv, char *out_type);
 void readImage(Matrix *image, const char *path);
 void writeImage(Matrix *image, const char *path);
@@ -166,7 +166,7 @@ void writeImage(Matrix *image, const char *path){
  *  Purpose: This function performs all the calculus related
  *  to the Hough Transform. This occurs from the image scanning
  *  and calculation of the rho = xcos (theta) + ysin (theta)
- *  [0 < theta <180] for pixels that display the high level.
+ *  [0 < theta < 180] for pixels that display the high level.
  *  It is worth mentioning that if the image passed as an
  *  input is not binarized, a threshold will be applied to
  *  it with a default threshold value set in THRESH_VALUE.
@@ -187,14 +187,13 @@ void houghTransform(Matrix *image, Matrix *accumulator, char out_type){
 					// rho = xcos(theta) + ysin(theta)
 					rho = ( (j)*cos(theta*M_PI/180)  ) + ( (i)*sin(theta*M_PI/180) );
 					// accumulator(theta,rho+D)++
-          if((int)((ceil(rho + accumulator->cols/2) * 180.0)) + theta>0 &&
-             (int)((ceil(rho + accumulator->cols/2) * 180.0)) + theta<accumulator->rows*accumulator->cols){
-               if(out_type=='b'){
-                 accumulator->pM[ (int)((ceil(rho + accumulator->cols/2) * 180.0)) + 180-theta-1]=255;
-               }
-               else{
-                 accumulator->pM[ (int)((ceil(rho + accumulator->cols/2) * 180.0)) + 180-theta-1]++;
-               }
+          if((int)((ceil(rho + accumulator->cols/2) * 180.0)) + theta>0 && (int)((ceil(rho + accumulator->cols/2) * 180.0)) + theta<accumulator->rows*accumulator->cols){
+           if(out_type=='b'){
+             accumulator->pM[ (int)((ceil(rho + accumulator->cols/2) * 180.0)) + 180-theta-1]=255;
+           }
+           else{
+             accumulator->pM[ (int)((ceil(rho + accumulator->cols/2) * 180.0)) + 180-theta-1]++;
+           }
           }
 				}
 			}
