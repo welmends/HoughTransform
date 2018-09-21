@@ -26,8 +26,9 @@
 //                                  Structs                                   //
 ////////////////////////////////////////////////////////////////////////////////
 typedef struct{
-    int rows,cols,grayscale;
-    unsigned char *pM;
+  char magicNumber[3];
+  int rows,cols,grayscale;
+  unsigned char *pM;
 }Matrix;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -65,6 +66,11 @@ int main(int argc, char **argv) {
     readImage(image, getImagePath(argv, out_type));
     houghTransform(image, accumulator, *out_type);
     writeImage(accumulator, "results/houghAccu.pgm");
+
+    free(image->pM);
+    free(image);
+    free(accumulator->pM);
+    free(accumulator);
     return 0;
   }
 }
@@ -123,6 +129,7 @@ char* getImagePath(char **argv, char *out_type){
   strcat(imagePath, "/");
   strcat(imagePath, argv[3]);
   strcat(imagePath, ".pgm");
+
   return imagePath;
 }
 
@@ -135,8 +142,6 @@ char* getImagePath(char **argv, char *out_type){
  * @return: void
  */
 void readImage(Matrix *image, const char *path){
-  int param1,param2,param3;
-  char aux[3];
   FILE *fp;
 
   // Open file in the provided path
@@ -147,7 +152,7 @@ void readImage(Matrix *image, const char *path){
   }
 
   // Read the magic number from the header
-  fscanf(fp,"%s",aux);
+  fscanf(fp,"%s",&*image->magicNumber);
 
   // Discard comments
   while(getc((fp)) == '#'){
@@ -183,7 +188,7 @@ void writeImage(Matrix *image, const char *path){
     }
 
     // Write the image in PGM format on the provided path
-    fprintf(fp, "P5\n");
+    fprintf(fp, "%s\n",image->magicNumber);
     fprintf(fp, "# PGM file generate by hough application\n");
     fprintf(fp, "%d %d\n",image->rows, image->cols);
     fprintf(fp, "%d\n",image->grayscale);
@@ -208,10 +213,11 @@ void houghTransform(Matrix *image, Matrix *accumulator, char out_type){
   // Calculate the height and width of the Hough accumulator
   // accu_width  = 0 to 180 degrees
 	// accu_height = 2*D - 1 and D = sqrt(height^2 + width^2)
-	accumulator->rows       = 180;
-  accumulator->cols       = ceil(2*(sqrt(image->rows*image->rows + image->cols*image->cols))) - 1;
-  accumulator->grayscale  = image->grayscale;
-	accumulator->pM         = (unsigned char*)calloc(accumulator->rows*accumulator->cols, sizeof(unsigned char));
+	accumulator->rows        = 180;
+  accumulator->cols        = ceil(2*(sqrt(image->rows*image->rows + image->cols*image->cols))) - 1;
+  accumulator->grayscale   = image->grayscale;
+	accumulator->pM          = (unsigned char*)calloc(accumulator->rows*accumulator->cols, sizeof(unsigned char));
+  strcpy(accumulator->magicNumber,image->magicNumber);
 
   // Go to each pixel with hight level (>THRESH_VALUE) and calculate Rho to each Theta
 	double rho;
