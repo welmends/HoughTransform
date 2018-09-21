@@ -1,8 +1,8 @@
 /**
  * @file hough.c
  * @brief Hough Transform Implemantation
-          Input: Path to an image, Type of the image (Canny or Original) and Output type (Binary or 8 Bits)
-          Output: Hough Transform Matrix (Accumulator)
+          Input : Path to an image, Type of the image (Canny or Original) and Output type (Binary or 8 Bits)
+          Output: Hough Transform Matrix (Accumulator image [PGM])
  * @author $Author:$ de Souza, Joao Wellington Mendes; Brito, Messyo Sousa
  * @version $Revision:$
  * @date $Date:$ 21/09/2018
