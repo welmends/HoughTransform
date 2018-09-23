@@ -98,6 +98,8 @@ void instructions(void){
   printf("| <type>       : canny or original                                           |\n");
   printf("| <out_type>   : binary or 8bits                                             |\n");
   printf("| <image_name> : Any PGM image                                               |\n");
+  printf("|                                                                            |\n");
+  printf("| OBS: The output image will be generated in 'results' folder                |\n");
   printf(" **************************************************************************** \n");
   printf("\n");
 }

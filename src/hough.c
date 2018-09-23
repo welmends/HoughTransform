@@ -84,18 +84,20 @@ int main(int argc, char **argv) {
  */
 void instructions(void){
   printf("\n");
-  printf(" ********************************************************* \n");
-  printf("|                      [Instructions]                     |\n");
-  printf("| Compile: gcc src/hough.c -o objs/hough.o -lm            |\n");
-  printf("| Command: ./objs/hough.o <type> <out_type> <image_name>  |\n");
-  printf("| Warning: The PGM image must be in 'images' folder       |\n");
-  printf("| Example: ./objs/hough.o canny binary lines              |\n");
-  printf("| Example: ./objs/hough.o original 8bits lines            |\n");
-  printf("|                                                         |\n");
-  printf("| <type>       : canny or original                        |\n");
-  printf("| <out_type>   : binary or 8bits                          |\n");
-  printf("| <image_name> : Any PGM image                            |\n");
-  printf(" ********************************************************* \n");
+  printf(" ************************************************************* \n");
+  printf("|                        [Instructions]                       |\n");
+  printf("| Compile: gcc src/hough.c -o objs/hough.o -lm                |\n");
+  printf("| Command: ./objs/hough.o <type> <out_type> <image_name>      |\n");
+  printf("| Warning: The PGM image must be in 'images' folder           |\n");
+  printf("| Example: ./objs/hough.o canny binary lines                  |\n");
+  printf("| Example: ./objs/hough.o original 8bits lines                |\n");
+  printf("|                                                             |\n");
+  printf("| <type>       : canny or original                            |\n");
+  printf("| <out_type>   : binary or 8bits                              |\n");
+  printf("| <image_name> : Any PGM image                                |\n");
+  printf("|                                                             |\n");
+  printf("| OBS: The output image will be generated in 'results' folder |\n");
+  printf(" ************************************************************* \n");
   printf("\n");
 }
 
