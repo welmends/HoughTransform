@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <time.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Macros                                   //
@@ -60,6 +61,8 @@ int main(int argc, char **argv) {
     return 1;
   }
   else{
+    struct timeval  tv1, tv2;
+    gettimeofday(&tv1, NULL);
     Matrix *image       = (Matrix*)calloc(1,sizeof(Matrix));
     Matrix *accumulator = (Matrix*)calloc(1,sizeof(Matrix));
     char out_type[1];
@@ -72,6 +75,9 @@ int main(int argc, char **argv) {
     free(image);
     free(accumulator->pM);
     free(accumulator);
+
+    gettimeofday(&tv2, NULL);
+    printf ("Total time = %f seconds\n", (double) (tv2.tv_usec - tv1.tv_usec) / 1000000 + (double) (tv2.tv_sec - tv1.tv_sec));
     return 0;
   }
 }

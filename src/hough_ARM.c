@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Macros                                   //
@@ -66,6 +67,8 @@ int main(int argc, char **argv) {
     return 1;
   }
   else{
+    struct timeval  tv1, tv2;
+    gettimeofday(&tv1, NULL);
     Matrix image[1];
     Matrix accumulator[1];
     char imagePath[IMAGE_PATH_SIZE];
@@ -75,6 +78,9 @@ int main(int argc, char **argv) {
     readImage(image, imagePath);
     houghTransform(image, accumulator, *out_type);
     writeImage(accumulator, "results/houghAccu.pgm");
+
+    gettimeofday(&tv2, NULL);
+    printf ("Total time = %f seconds\n", (double) (tv2.tv_usec - tv1.tv_usec) / 1000000 + (double) (tv2.tv_sec - tv1.tv_sec));
     return 0;
   }
 }
@@ -282,7 +288,7 @@ void houghTransform(Matrix *image, Matrix *accumulator, char out_type){
   accumulator->cols        = _ceil(2*(_sqrt(image->rows*image->rows + image->cols*image->cols))) - 1;
   accumulator->grayscale   = image->grayscale;
   strcpy(accumulator->magicNumber,image->magicNumber);
-
+  
   // Go to each pixel with hight level (>THRESH_VALUE) and calculate Rho to each Theta
 	float rho;
 	int theta,i,j;
