@@ -117,7 +117,9 @@ void instructions(void){
  * @author: Joao Wellington and Messyo Sousa
  * @brief: Verifies the type arguments and returns a path to read a specifc
  *         image.
- * @param: char **argv, char *out_type
+ * @param: char **argv     - main arguments
+           char *imagePath - variable to store image path
+           char *out_type  - variable to store output type chosen
  * @return: char*
  */
 char* getImagePath(char **argv, char *out_type){
@@ -153,7 +155,8 @@ char* getImagePath(char **argv, char *out_type){
  * @brief: Since the path to a specific image was passed to this method, this
  *         function reads the header and the PGM image and stores this at the
  *         Matrix Structure passed as input to this method.
- * @param: Matrix *image, const char *path
+ * @param: Matrix *image    - image Matrix to store in reading process
+           const char *path - image path
  * @return: void
  */
 void readImage(Matrix *image, const char *path){
@@ -189,7 +192,8 @@ void readImage(Matrix *image, const char *path){
  * @author: Joao Wellington and Messyo Sousa
  * @brief: Writes the Matrix Structure passed as input to this method in a
  *         specific path that was also passed as input to this method.
- * @param: Matrix *image, const char *path
+ * @param: Matrix *image    - image Matrix to write in output image path
+           const char *path - output image path
  * @return: void
  */
 void writeImage(Matrix *image, const char *path){
@@ -222,8 +226,10 @@ void writeImage(Matrix *image, const char *path){
  *         if the image passed as an input is not binarized, a threshold will
  *         be applied to it with a default threshold value set in THRESH_VALUE.
  *         More information: http://homepages.inf.ed.ac.uk/rbf/HIPR2/hough.htm
- *                           PATENT US3069654A - Paul V C Hough 
- * @param: Matrix *image, Matrix *accumulator, char out_type
+ *                           PATENT US3069654A - Paul V C Hough
+ * @param: Matrix *image       - input image Matrix
+           Matrix *accumulator - variable to store the accumulator
+           char out_type       - output type chosen
  * @return: void
  */
 void houghTransform(Matrix *image, Matrix *accumulator, char out_type){
