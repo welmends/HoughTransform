@@ -1,12 +1,18 @@
 /**
- * @file hough.c
- * @brief Hough Transform Implemantation - ARMv6(Raspberry)
+ * @file hough_ARM.c
+ * @brief Standard Hough Transform Implemantation on C language
+          Platform: ARM - Raspberry (arm-unknown-linux-gnueabi-gcc)
+
           Input : Path to an image, Type of the image (Canny or Original) and
                   Output type (Binary or 8 Bits)
           Output: Hough Transform Matrix (Accumulator image [PGM])
+
+          Other: More information about the use of this code is present in
+                 instructions method
+
  * @author $Author:$ de Souza, Joao Wellington Mendes; Brito, Messyo Sousa
  * @version $Revision:$
- * @date $Date:$ 21/09/2018
+ * @date $Date:$ 29/09/2018
  */
 
  ///////////////////////////////////////////////////////////////////////////////
@@ -20,12 +26,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Macros                                   //
 ////////////////////////////////////////////////////////////////////////////////
-#define M_PI            (3.14159265358979323846)
-#define IMAGE_PATH_SIZE (100)
-#define THRESH_VALUE    (200)
-#define MAX_ROWS        (1920)
-#define MAX_COLS        (1080)
-//           1080p          //
+#define M_PI            (3.14159265358979323846)//PI value approximation
+#define IMAGE_PATH_SIZE (100)//Standard size for image path
+#define THRESH_VALUE    (200)//Standard thresh value
+#define MAX_ROWS        (1920)//Maximum size for rows
+#define MAX_COLS        (1080)//Maximum size for cols
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                  Structs                                   //
@@ -67,19 +72,19 @@ int main(int argc, char **argv) {
     return 1;
   }
   else{
-    struct timeval  tv1, tv2;
-    gettimeofday(&tv1, NULL);
-    Matrix image[1];
-    Matrix accumulator[1];
-    char imagePath[IMAGE_PATH_SIZE];
-    char out_type[1];
+    Matrix image[1];//image Matrix
+    Matrix accumulator[1];//accumulator Matrix
+    char imagePath[IMAGE_PATH_SIZE];//image path
+    char out_type[1];//output type chosen
+    struct timeval  tv1, tv2;//variables to time measurement
 
+    gettimeofday(&tv1, NULL);
     getImagePath(argv,imagePath,out_type);
     readImage(image, imagePath);
     houghTransform(image, accumulator, *out_type);
     writeImage(accumulator, "results/houghAccu.pgm");
-
     gettimeofday(&tv2, NULL);
+
     printf ("Total time = %f seconds\n", (double) (tv2.tv_usec - tv1.tv_usec) / 1000000 + (double) (tv2.tv_sec - tv1.tv_sec));
     return 0;
   }
@@ -151,7 +156,7 @@ void getImagePath(char **argv, char *imagePath, char *out_type){
  * @return: void
  */
 void readImage(Matrix *image, const char *path){
-  FILE *fp;
+  FILE *fp;//FILE variable
 
   // Open file in the provided path
   fp = fopen(path, "r");
@@ -186,7 +191,7 @@ void readImage(Matrix *image, const char *path){
  * @return: void
  */
 void writeImage(Matrix *image, const char *path){
-    FILE *fp;
+    FILE *fp;//FILE variable
 
     // Open file in the provided path
     fp = fopen(path, "w");
@@ -208,7 +213,7 @@ void writeImage(Matrix *image, const char *path){
 
 /**
  * @author: Joao Wellington and Messyo Sousa
- * @brief: Calculates the square root of n.
+ * @brief: Calculates a square root of n from Newton's method.
  * @param: int n
  * @return: unsigned int
  */
@@ -217,11 +222,12 @@ unsigned int _sqrt(int n) {
   unsigned int n2 = (((n1) + (n)/(n1)) >> 1);
 
   while(abs(n2 - n1) > 1) {
-    n1  = n2;
+    n1 = n2;
     n2 = (((n) + (n)/(n1)) >> 1);
   }
-  while(n2*n2 > n)
+  while(n2*n2 > n){
     n2--;
+  }
   return n2;
 }
 
@@ -232,41 +238,41 @@ unsigned int _sqrt(int n) {
  * @return: int
  */
 int _ceil(float n) {
-    int ceil_n = (int)n;
-    if (n == (float)ceil_n) {
-        return ceil_n;
-    }
-    return ceil_n + 1;
+  int ceil_n = (int)n;
+  if (n == (float)ceil_n) {
+    return ceil_n;
+  }
+  return ceil_n + 1;
 }
 
 /**
  * @author: Joao Wellington and Messyo Sousa
- * @brief: Calculates the sine of x from the Taylor series.
+ * @brief: Calculates the sine of x from the Taylor's series.
  * @param: float x
  * @return: float
  */
 float _sin(float x){
-    return (x) -
-           ((x*x*x)/(3*2*1.0)) +
-           ((x*x*x*x*x)/(5*4*3*2*1.0)) -
-           ((x*x*x*x*x*x*x)/(7*6*5*4*3*2*1.0)) +
-           ((x*x*x*x*x*x*x*x*x)/(9*8*7*6*5*4*3*2*1.0)) -
-           ((x*x*x*x*x*x*x*x*x*x*x)/(11*10*9*8*7*6*5*4*3*2*1.0));
+  return (x) -
+         ((x*x*x)/(3*2*1.0)) +
+         ((x*x*x*x*x)/(5*4*3*2*1.0)) -
+         ((x*x*x*x*x*x*x)/(7*6*5*4*3*2*1.0)) +
+         ((x*x*x*x*x*x*x*x*x)/(9*8*7*6*5*4*3*2*1.0)) -
+         ((x*x*x*x*x*x*x*x*x*x*x)/(11*10*9*8*7*6*5*4*3*2*1.0));
 }
 
 /**
  * @author: Joao Wellington and Messyo Sousa
- * @brief: Calculates the cosine of x from the Taylor series.
+ * @brief: Calculates the cosine of x from the Taylor's series.
  * @param: float x
  * @return: float
  */
 float _cos(float x){
-    return (1.0) -
-           ((x*x)/(2*1.0)) +
-           ((x*x*x*x)/(4*3*2*1.0)) -
-           ((x*x*x*x*x*x)/(6*5*4*3*2*1.0)) +
-           ((x*x*x*x*x*x*x*x)/(8*7*6*5*4*3*2*1.0)) -
-           ((x*x*x*x*x*x*x*x*x*x)/(10*9*8*7*6*5*4*3*2*1.0));
+  return (1.0) -
+         ((x*x)/(2*1.0)) +
+         ((x*x*x*x)/(4*3*2*1.0)) -
+         ((x*x*x*x*x*x)/(6*5*4*3*2*1.0)) +
+         ((x*x*x*x*x*x*x*x)/(8*7*6*5*4*3*2*1.0)) -
+         ((x*x*x*x*x*x*x*x*x*x)/(10*9*8*7*6*5*4*3*2*1.0));
 }
 
 /**
@@ -277,6 +283,8 @@ float _cos(float x){
  *         display the high level (>THRESH_VALUE). It is worth mentioning that
  *         if the image passed as an input is not binarized, a threshold will
  *         be applied to it with a default threshold value set in THRESH_VALUE.
+ *         More information: http://homepages.inf.ed.ac.uk/rbf/HIPR2/hough.htm
+ *                           PATENT US3069654A - Paul V C Hough 
  * @param: Matrix *image, Matrix *accumulator, char out_type
  * @return: void
  */
@@ -288,7 +296,7 @@ void houghTransform(Matrix *image, Matrix *accumulator, char out_type){
   accumulator->cols        = _ceil(2*(_sqrt(image->rows*image->rows + image->cols*image->cols))) - 1;
   accumulator->grayscale   = image->grayscale;
   strcpy(accumulator->magicNumber,image->magicNumber);
-  
+
   // Go to each pixel with hight level (>THRESH_VALUE) and calculate Rho to each Theta
 	float rho;
 	int theta,i,j;

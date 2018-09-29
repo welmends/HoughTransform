@@ -1,12 +1,18 @@
 /**
  * @file hough.c
- * @brief Hough Transform Implemantation
+ * @brief Standard Hough Transform Implemantation on C language
+          Platform: LINUX (gcc)
+
           Input : Path to an image, Type of the image (Canny or Original) and
                   Output type (Binary or 8 Bits)
           Output: Hough Transform Matrix (Accumulator image [PGM])
+
+          Other: More information about the use of this code is present in
+                 instructions method
+
  * @author $Author:$ de Souza, Joao Wellington Mendes; Brito, Messyo Sousa
  * @version $Revision:$
- * @date $Date:$ 21/09/2018
+ * @date $Date:$ 29/09/2018
  */
 
  ///////////////////////////////////////////////////////////////////////////////
@@ -14,15 +20,15 @@
  ///////////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include <string.h>
 #include <time.h>
+#include <math.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Macros                                   //
 ////////////////////////////////////////////////////////////////////////////////
-#define IMAGE_PATH_SIZE (100)
-#define THRESH_VALUE    (200)
+#define IMAGE_PATH_SIZE (100)//Standard size for image path
+#define THRESH_VALUE    (200)//Standard thresh value
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                  Structs                                   //
@@ -61,22 +67,22 @@ int main(int argc, char **argv) {
     return 1;
   }
   else{
-    struct timeval  tv1, tv2;
-    gettimeofday(&tv1, NULL);
-    Matrix *image       = (Matrix*)calloc(1,sizeof(Matrix));
-    Matrix *accumulator = (Matrix*)calloc(1,sizeof(Matrix));
-    char out_type[1];
+    Matrix *image       = (Matrix*)calloc(1,sizeof(Matrix));//image Matrix
+    Matrix *accumulator = (Matrix*)calloc(1,sizeof(Matrix));//accumulator Matrix
+    char out_type[1];//output type chosen
+    struct timeval  tv1, tv2;//variales to time measurement
 
+    gettimeofday(&tv1, NULL);
     readImage(image, getImagePath(argv, out_type));
     houghTransform(image, accumulator, *out_type);
     writeImage(accumulator, "results/houghAccu.pgm");
+    gettimeofday(&tv2, NULL);
 
     free(image->pM);
     free(image);
     free(accumulator->pM);
     free(accumulator);
 
-    gettimeofday(&tv2, NULL);
     printf ("Total time = %f seconds\n", (double) (tv2.tv_usec - tv1.tv_usec) / 1000000 + (double) (tv2.tv_sec - tv1.tv_sec));
     return 0;
   }
@@ -151,7 +157,7 @@ char* getImagePath(char **argv, char *out_type){
  * @return: void
  */
 void readImage(Matrix *image, const char *path){
-  FILE *fp;
+  FILE *fp;//FILE variable
 
   // Open file in the provided path
   fp = fopen(path, "r");
@@ -187,7 +193,7 @@ void readImage(Matrix *image, const char *path){
  * @return: void
  */
 void writeImage(Matrix *image, const char *path){
-    FILE *fp;
+    FILE *fp;//FILE variable
 
     // Open file in the provided path
     fp = fopen(path, "w");
@@ -215,6 +221,8 @@ void writeImage(Matrix *image, const char *path){
  *         display the high level (>THRESH_VALUE). It is worth mentioning that
  *         if the image passed as an input is not binarized, a threshold will
  *         be applied to it with a default threshold value set in THRESH_VALUE.
+ *         More information: http://homepages.inf.ed.ac.uk/rbf/HIPR2/hough.htm
+ *                           PATENT US3069654A - Paul V C Hough 
  * @param: Matrix *image, Matrix *accumulator, char out_type
  * @return: void
  */
